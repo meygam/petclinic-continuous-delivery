@@ -10,11 +10,6 @@ Vagrant.configure(2) do |config|
       artifactory.vm.box = "hashicorp/precise64"
       artifactory.vm.network "private_network", ip: "192.168.33.10"
 
-      artifactory.vm.provider "virtualbox" do |vb|
-        # Customize the amount of memory on the VM:
-        vb.memory = "512"
-      end
-
       artifactory.berkshelf.enabled = true
       artifactory.berkshelf.berksfile_path = 'chef/berkshelf/artifactory'
 
@@ -22,6 +17,22 @@ Vagrant.configure(2) do |config|
         chef.cookbooks_path = "chef/cookbooks"
         chef.roles_path = "chef/roles"
         chef.add_role "artifactory"
+        chef.environments_path = "chef/environments"
+        chef.environment = "dev"
+      end
+    end
+
+    config.vm.define "jenkins" do |jenkins|
+      jenkins.vm.box = "hashicorp/precise64"
+      jenkins.vm.network "private_network", ip: "192.168.33.11"
+
+      jenkins.berkshelf.enabled = true
+      jenkins.berkshelf.berksfile_path = 'chef/berkshelf/jenkins'
+
+      jenkins.vm.provision :chef_solo do |chef|
+        chef.cookbooks_path = "chef/cookbooks"
+        chef.roles_path = "chef/roles"
+        chef.add_role "jenkins"
         chef.environments_path = "chef/environments"
         chef.environment = "dev"
       end
