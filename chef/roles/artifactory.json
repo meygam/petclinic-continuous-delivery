@@ -1,0 +1,10 @@
+{
+    "name": "app",
+    "default_attributes": { },
+    "description": "This installs artifactory",
+    "json_class": "Chef::Role",
+    "chef_type": "role",
+    "run_list": [
+        "recipe[artifactory::default]"
+    ]
+}
