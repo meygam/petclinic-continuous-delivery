@@ -1,0 +1,110 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This template creats the tools stack viz jenkins, artifactory",
+  "Parameters": {
+    "InstanceType": {
+      "Description": "Instance type",
+      "Type": "String",
+      "Default": "t2.micro"
+    }
+  },
+  "Mappings": {
+    "AWSRegionMap": {
+      "us-west-1": {
+        "ami": "ami-39827a7d",
+        "key": "meygam"
+      },
+      "us-east-1": {
+        "ami": "ami-8502bdee",
+        "key": "us-east-1"
+      }
+    }
+  },
+  "Resources": {
+    "JenkinsServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ami"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "key"
+          ]
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "JenkinsServerSecurityGroup"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash","\n",
+                "git clone https://github.com/meygam/petclinic-continuous-delivery.git /home/ubuntu/petclinic-continuous-delivery","\n",
+                "ln -s /home/ubuntu/petclinic-continuous-delivery/chef /opt/chef","\n",
+                "berks vendor -b /opt/chef/berkshelf/jenkins /opt/chef/cookbooks/","\n",
+                "chef-solo -c /opt/chef/solo.rb -o 'role[jenkins]'","\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "JenkinsServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable port 8080,22 access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8080",
+            "ToPort": "8080",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "WebsiteURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "JenkinsServer",
+                "PublicDnsName"
+              ]
+            },
+            ":8080"
+          ]
+        ]
+      },
+      "Description": "URL for Jenkins Server"
+    }
+  }
+}

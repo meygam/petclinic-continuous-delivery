@@ -1,0 +1,10 @@
+{
+    "name": "petclinic",
+    "default_attributes": {},
+    "description": "This installs tomcat 8",
+    "json_class": "Chef::Role",
+    "chef_type": "role",
+    "run_list": [
+      "recipe[meygam_tomcat::default]"
+    ]
+}

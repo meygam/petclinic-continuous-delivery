@@ -1,0 +1,2 @@
+source 'https://supermarket.getchef.com'
+cookbook 'artifactory', '~> 0.3.1'
