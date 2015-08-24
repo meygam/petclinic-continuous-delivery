@@ -25,3 +25,9 @@ jenkins_plugin 'build-flow-plugin' do
   action :install
   notifies :restart, 'service[jenkins]'
 end
+
+jenkins_plugin 'jenkins-cloudformation-plugin' do
+  version '1.0'
+  action :install
+  notifies :restart, 'service[jenkins]'
+end

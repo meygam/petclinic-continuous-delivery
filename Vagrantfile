@@ -59,26 +59,4 @@ Vagrant.configure(2) do |config|
         chef.environment = "dev"
       end
     end
-
-    config.vm.define "tomcat8" do |tomcat8|
-      tomcat8.vm.box = "hashicorp/precise64"
-      tomcat8.vm.network "private_network", ip: "192.168.33.13"
-
-      tomcat8.vm.provider "virtualbox" do |vb|
-       # Customize the amount of memory on the VM:
-       vb.memory = "2048"
-       vb.cpus = "2"
-     end
-
-      tomcat8.berkshelf.enabled = true
-      tomcat8.berkshelf.berksfile_path = 'chef/cookbooks/meygam_tomcat/Berksfile'
-
-      tomcat8.vm.provision :chef_solo do |chef|
-        chef.cookbooks_path = "chef/cookbooks"
-        chef.roles_path = "chef/roles"
-        chef.add_role "tomcat8"
-        chef.environments_path = "chef/environments"
-        chef.environment = "dev"
-      end
-    end
 end
