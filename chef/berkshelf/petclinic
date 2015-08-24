@@ -1,0 +1,4 @@
+source 'https://supermarket.getchef.com'
+cookbook 'maven', '~> 1.3.0'
+cookbook 'tomcat', '~> 0.17.3'
+cookbook 'meygam_petclinic', path: '../cookbooks/meygam_petclinic'

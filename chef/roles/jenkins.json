@@ -1,5 +1,5 @@
 {
-    "name": "app",
+    "name": "jenkins",
     "default_attributes": {
       "jenkins": {
         "master": {
@@ -7,12 +7,12 @@
         }
       }
     },
-    "description": "This installs artifactory",
+    "description": "This installs jenkins",
     "json_class": "Chef::Role",
     "chef_type": "role",
     "run_list": [
-        "recipe[jenkins::java]",
-        "recipe[jenkins::master]",
-        "recipe[meygam_jenkins::plugins]"
+      "recipe[jenkins::java]",
+      "recipe[jenkins::master]",
+      "recipe[meygam_jenkins::plugins]"
     ]
 }

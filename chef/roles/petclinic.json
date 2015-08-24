@@ -1,0 +1,17 @@
+{
+    "name": "petclinic",
+    "default_attributes": {
+      "tomcat": {
+        "base_version": 8,
+        "java_options": "${JAVA_OPTS} -Xmx1024M -Djava.awt.headless=true"
+      }
+    },
+    "description": "This installs grails-petclinic app",
+    "json_class": "Chef::Role",
+    "chef_type": "role",
+    "run_list": [
+      "recipe[maven::default]",
+      "recipe[tomcat::default]",
+      "recipe[meygam_petclinic::default]"
+    ]
+}
