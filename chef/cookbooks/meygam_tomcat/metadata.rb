@@ -8,3 +8,4 @@ version          '0.1.0'
 
 depends 'apt', '= 2.8.1'
 depends 'java', '= 1.35.0'
+depends 'tar', '= 0.7.0'

@@ -11,7 +11,7 @@
     "chef_type": "role",
     "run_list": [
       "recipe[maven::default]",
-      "recipe[tomcat::default]",
+      "recipe[meygam_tomcat::default]",
       "recipe[meygam_petclinic::default]"
     ]
 }
