@@ -1,0 +1,154 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "This template creats the petclinic stack viz tomcat app server, ELB",
+  "Parameters": {
+    "InstanceType": {
+      "Description": "Instance type",
+      "Type": "String",
+      "Default": "t2.medium"
+    }
+  },
+  "Mappings": {
+    "AWSRegionMap": {
+      "us-west-1": {
+        "ami": "ami-39827a7d",
+        "key": "meygam"
+      },
+      "us-east-1": {
+        "ami": "ami-8502bdee",
+        "key": "us-east-1"
+      }
+    }
+  },
+  "Resources": {
+    "PetclinicAsg": {
+      "Properties": {
+        "AvailabilityZones": [
+          "us-west-1a",
+          "us-west-1b"
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "PetclinicLC"
+        },
+        "MaxSize": 2,
+        "MinSize": 1
+      },
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": 1
+        }
+      }
+    },
+    "PetclinicLC": {
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ami"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "key"
+          ]
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "PetClinicAppServerSecurityGroup"
+          }
+        ],
+        "LoadBalancerNames": [
+          {
+            "Ref": "PetClinicAppELB"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash",
+                "\n",
+                "git clone https://github.com/meygam/petclinic-continuous-delivery.git /home/ubuntu/petclinic-continuous-delivery",
+                "\n",
+                "ln -s /home/ubuntu/petclinic-continuous-delivery/chef /opt/chef",
+                "\n",
+                "export BERKSHELF_PATH=/root/.berkshelf",
+                "\n",
+                "berks vendor -b /opt/chef/berkshelf/petclinic /opt/chef/cookbooks",
+                "\n",
+                "chef-solo -c /opt/chef/solo.rb -o 'role[petclinic]'",
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "Type": "AWS::AutoScaling::LaunchConfiguration"
+    },
+    "PetClinicAppServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable port 8080,22 access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8080",
+            "ToPort": "8080",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "PetClinicAppELB": {
+      "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+      "Properties": {
+        "Listeners": [
+          {
+            "InstancePort" : 8080,
+            "InstanceProtocol" : "HTTP",
+            "LoadBalancerPort" : 80,
+            "Protocol" : "HTTP"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "PetclinicURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "PetClinicAppELB",
+                "DNSName"
+              ]
+            },
+            "/grails-petclinic/"
+          ]
+        ]
+      },
+      "Description": "URL for Pet Clinic App"
+    }
+  }
+}

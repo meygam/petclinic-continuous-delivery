@@ -31,3 +31,9 @@ jenkins_plugin 'jenkins-cloudformation-plugin' do
   action :install
   notifies :restart, 'service[jenkins]'
 end
+
+jenkins_plugin 'python' do
+  version '1.2'
+  action :install
+  notifies :restart, 'service[jenkins]'
+end
