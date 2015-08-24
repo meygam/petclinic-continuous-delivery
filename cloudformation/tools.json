@@ -5,7 +5,7 @@
     "InstanceType": {
       "Description": "Instance type",
       "Type": "String",
-      "Default": "t2.micro"
+      "Default": "t2.medium"
     }
   },
   "Mappings": {
@@ -58,7 +58,8 @@
                 "#!/bin/bash","\n",
                 "git clone https://github.com/meygam/petclinic-continuous-delivery.git /home/ubuntu/petclinic-continuous-delivery","\n",
                 "ln -s /home/ubuntu/petclinic-continuous-delivery/chef /opt/chef","\n",
-                "berks vendor -b /opt/chef/berkshelf/jenkins /opt/chef/cookbooks/","\n",
+                "export BERKSHELF_PATH=/root/.berkshelf","\n",
+                "berks vendor -b /opt/chef/berkshelf/jenkins /opt/chef/cookbooks","\n",
                 "chef-solo -c /opt/chef/solo.rb -o 'role[jenkins]'","\n"
               ]
             ]
@@ -85,10 +86,76 @@
           }
         ]
       }
+    },
+    "ArtifactoryServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "ami"
+          ]
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Fn::FindInMap": [
+            "AWSRegionMap",
+            {
+              "Ref": "AWS::Region"
+            },
+            "key"
+          ]
+        },
+        "SecurityGroups": [
+          {
+            "Ref": "ArtifactoryServerSecurityGroup"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash","\n",
+                "git clone https://github.com/meygam/petclinic-continuous-delivery.git /home/ubuntu/petclinic-continuous-delivery","\n",
+                "ln -s /home/ubuntu/petclinic-continuous-delivery/chef /opt/chef","\n",
+                "export BERKSHELF_PATH=/root/.berkshelf","\n",
+                "berks vendor -b /opt/chef/berkshelf/artifactory /opt/chef/cookbooks","\n",
+                "chef-solo -c /opt/chef/solo.rb -o 'role[artifactory]'","\n"
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "ArtifactoryServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable port 8081,22 access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "8081",
+            "ToPort": "8081",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
     }
   },
   "Outputs": {
-    "WebsiteURL": {
+    "JenkinsURL": {
       "Value": {
         "Fn::Join": [
           "",
@@ -105,6 +172,24 @@
         ]
       },
       "Description": "URL for Jenkins Server"
+    },
+    "ArtifactoryURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt": [
+                "ArtifactoryServer",
+                "PublicDnsName"
+              ]
+            },
+            ":8081/artifactory"
+          ]
+        ]
+      },
+      "Description": "URL for Artifactory Server"
     }
   }
 }
