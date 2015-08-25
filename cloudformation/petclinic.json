@@ -31,7 +31,12 @@
           "Ref": "PetclinicLC"
         },
         "MaxSize": 2,
-        "MinSize": 1
+        "MinSize": 1,
+        "LoadBalancerNames": [
+          {
+            "Ref": "PetClinicAppELB"
+          }
+        ]
       },
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "UpdatePolicy": {
@@ -68,11 +73,6 @@
             "Ref": "PetClinicAppServerSecurityGroup"
           }
         ],
-        "LoadBalancerNames": [
-          {
-            "Ref": "PetClinicAppELB"
-          }
-        ],
         "UserData": {
           "Fn::Base64": {
             "Fn::Join": [
@@ -88,7 +88,7 @@
                 "\n",
                 "berks vendor -b /opt/chef/berkshelf/petclinic /opt/chef/cookbooks",
                 "\n",
-                "chef-solo -c /opt/chef/solo.rb -o 'role[petclinic]'",
+                "chef-solo -c /opt/chef/solo.rb -o 'role[petclinic]' -E prod",
                 "\n"
               ]
             ]
@@ -120,12 +120,16 @@
     "PetClinicAppELB": {
       "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
       "Properties": {
+        "AvailabilityZones": [
+          "us-west-1a",
+          "us-west-1b"
+        ],
         "Listeners": [
           {
-            "InstancePort" : 8080,
-            "InstanceProtocol" : "HTTP",
-            "LoadBalancerPort" : 80,
-            "Protocol" : "HTTP"
+            "InstancePort": 8080,
+            "InstanceProtocol": "HTTP",
+            "LoadBalancerPort": 80,
+            "Protocol": "HTTP"
           }
         ]
       }

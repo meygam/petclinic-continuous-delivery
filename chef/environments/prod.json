@@ -1,0 +1,11 @@
+{
+    "name": "dev",
+    "override_attributes" : {
+      "meygam": {
+        "artifactory_server" : "52.8.216.174"
+      }
+    },
+    "json_class": "Chef::Environment",
+    "description": "",
+    "chef_type": "environment"
+}
