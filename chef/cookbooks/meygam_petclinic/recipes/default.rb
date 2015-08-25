@@ -7,8 +7,8 @@
 # All rights reserved - Do Not Redistribute
 #
 
-maven 'grails-petclinic' do
-  group_id 'petclinic'
+maven 'petclinic' do
+  group_id 'io.meygam'
   version  '0.2-SNAPSHOT'
   packaging 'war'
   dest node['meygam_tomcat']['webapp_dir']
