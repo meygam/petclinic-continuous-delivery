@@ -2,7 +2,7 @@
     "name": "dev",
     "override_attributes" : {
       "meygam": {
-        "artifactory_server" : "52.8.216.174"
+        "artifactory_server" : "ec2-54-67-114-215.us-west-1.compute.amazonaws.com"
       }
     },
     "json_class": "Chef::Environment",

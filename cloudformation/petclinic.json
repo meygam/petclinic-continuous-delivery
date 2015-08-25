@@ -11,11 +11,11 @@
   "Mappings": {
     "AWSRegionMap": {
       "us-west-1": {
-        "ami": "ami-39827a7d",
+        "ami": "ami-a5fa02e1",
         "key": "meygam"
       },
       "us-east-1": {
-        "ami": "ami-8502bdee",
+        "ami": "ami-05d26c6e",
         "key": "us-east-1"
       }
     }
