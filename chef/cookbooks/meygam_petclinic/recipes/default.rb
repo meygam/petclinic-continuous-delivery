@@ -7,7 +7,7 @@
 # All rights reserved - Do Not Redistribute
 #
 
-maven 'grails-petclinic' do
+maven 'petclinic' do
   group_id 'petclinic'
   version  '0.2-SNAPSHOT'
   packaging 'war'
